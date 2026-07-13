@@ -1,0 +1,92 @@
+"""Shared metadata for the survey form and the dashboard."""
+
+PROJECT_HEADER = "Octa Research · HARMONIA project"
+
+RATING_OPTIONS = [1, 2, 3, 4, 5]
+RATING_LABELS = {
+    1: "1 – Not at all / None",
+    2: "2 – Very limited",
+    3: "3 – Partial / Moderate",
+    4: "4 – Good / Most cases",
+    5: "5 – Fully / Extensive",
+}
+
+# Broadened to reflect HARMONIA's actual partner mix: universities, hospitals,
+# ministries/regulators, development/international organisations, innovation
+# actors, NGOs — not only clinical institutions.
+ORG_TYPES = [
+    "University / research institute",
+    "Hospital / health facility",
+    "Ministry / government policy body",
+    "Regulatory authority",
+    "International / development organisation",
+    "Innovation hub / technology provider / SME",
+    "NGO / civil society organisation",
+    "Other",
+]
+
+STAFF_BUCKETS = ["0", "1–5", "6–15", "16–30", "30+"]
+COUNT_BUCKETS_0TO10PLUS = ["0", "1–3", "4–10", "10+"]
+COUNT_BUCKETS_0TO6PLUS = ["0–1", "2–3", "4–5", "6+", "Don't know"]
+COUNT_BUCKETS_EU_PROJECTS = ["0", "1–2", "3–5", "6+"]
+
+STANDARDS_OPTIONS = [
+    "HL7 FHIR",
+    "SNOMED CT",
+    "ICD-10/11",
+    "National-only formats",
+    "None",
+    "Not applicable to our role",
+    "Don't know",
+]
+SCALEUP_BARRIERS = [
+    "Funding ended",
+    "No institutional decision/ownership",
+    "Technical/integration issues",
+    "Lack of government engagement",
+    "Staff capacity",
+    "Not applicable",
+    "Other",
+]
+
+# One representative rating question per core need — used to build the
+# "which need is most urgent" dashboard view. Lower average = greater need.
+CORE_NEEDS = {
+    "N1": {
+        "title": "N1 · Fragmentation of digital systems",
+        "column": "q2_integration_rating",
+        "question": "Extent to which relevant systems/platforms share data automatically",
+    },
+    "N2": {
+        "title": "N2 · Interoperability & data governance",
+        "column": "q6_data_sharing_rating",
+        "question": "Ability to securely share data/information with external partners",
+    },
+    "N3": {
+        "title": "N3 · Responsible AI & contextual validation",
+        "column": "q9_ai_confidence_rating",
+        "question": "Confidence assessing whether an AI/digital tool is fit for local context",
+    },
+    "N4": {
+        "title": "N4 · Human capital & implementation capacity",
+        "column": "q11_staffing_rating",
+        "question": "Adequacy of current staffing/expertise",
+    },
+    "N5": {
+        "title": "N5 · Scale-up gap",
+        "column": "q15_scaleup_readiness",
+        "question": "Readiness to move pilots/initiatives into routine, wider-scale use",
+    },
+    "N6": {
+        "title": "N6 · Policy uptake & sustainability",
+        "column": "q17_policy_feed_rating",
+        "question": "Extent relevant work feeds into national/regional strategy or policy",
+    },
+}
+
+SECONDARY_NEEDS = {
+    "Infrastructure (connectivity/electricity)": "q19_infrastructure_rating",
+    "Leadership support": "q21_leadership_rating",
+    "Dissemination capacity": "q23_dissemination_rating",
+    "Grant management experience": "q24_grant_mgmt_rating",
+}
