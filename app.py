@@ -16,8 +16,14 @@ Requires .streamlit/secrets.toml with your Supabase project URL + anon key
 from __future__ import annotations
 
 import pandas as pd
-import plotly.express as px
 import streamlit as st
+
+try:
+    import plotly.express as px
+    HAS_PLOTLY = True
+except ImportError:
+    px = None
+    HAS_PLOTLY = False
 
 from config import (
     PROJECT_HEADER,
@@ -378,6 +384,13 @@ def render_dashboard():
     render_header()
     st.title("📊 Needs Assessment Dashboard")
 
+    if not HAS_PLOTLY:
+        st.warning(
+            "Optional charting library 'plotly' is not installed — showing "
+            "simplified charts. Check that `plotly` is in requirements.txt "
+            "and reboot the app to enable the full charts."
+        )
+
     try:
         records = fetch_responses()
     except Exception as exc:  # noqa: BLE001
@@ -421,18 +434,22 @@ def render_dashboard():
             avg = pd.to_numeric(fdf[col], errors="coerce").mean()
             need_rows.append({"Need": meta["title"], "Average rating": avg})
     need_df = pd.DataFrame(need_rows).sort_values("Average rating")
-    fig = px.bar(
-        need_df,
-        x="Average rating",
-        y="Need",
-        orientation="h",
-        range_x=[0, 5],
-        text=need_df["Average rating"].round(2),
-        color="Average rating",
-        color_continuous_scale="RdYlGn",
-    )
-    fig.update_layout(coloraxis_showscale=False, height=350)
-    st.plotly_chart(fig, use_container_width=True)
+    if HAS_PLOTLY:
+        fig = px.bar(
+            need_df,
+            x="Average rating",
+            y="Need",
+            orientation="h",
+            range_x=[0, 5],
+            text=need_df["Average rating"].round(2),
+            color="Average rating",
+            color_continuous_scale="RdYlGn",
+        )
+        fig.update_layout(coloraxis_showscale=False, height=350)
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.bar_chart(need_df.set_index("Need")["Average rating"])
+        st.dataframe(need_df, use_container_width=True, hide_index=True)
 
     # --- Secondary needs ---
     st.subheader("Secondary needs — average rating")
@@ -442,12 +459,15 @@ def render_dashboard():
             avg = pd.to_numeric(fdf[col], errors="coerce").mean()
             sec_rows.append({"Need": label, "Average rating": avg})
     sec_df = pd.DataFrame(sec_rows).sort_values("Average rating")
-    fig2 = px.bar(
-        sec_df, x="Average rating", y="Need", orientation="h", range_x=[0, 5],
-        text=sec_df["Average rating"].round(2),
-    )
-    fig2.update_layout(height=280)
-    st.plotly_chart(fig2, use_container_width=True)
+    if HAS_PLOTLY:
+        fig2 = px.bar(
+            sec_df, x="Average rating", y="Need", orientation="h", range_x=[0, 5],
+            text=sec_df["Average rating"].round(2),
+        )
+        fig2.update_layout(height=280)
+        st.plotly_chart(fig2, use_container_width=True)
+    else:
+        st.bar_chart(sec_df.set_index("Need")["Average rating"])
 
     st.divider()
 
@@ -467,9 +487,14 @@ def render_dashboard():
             continue
         counts = fdf[col].fillna("No answer").value_counts().reset_index()
         counts.columns = [label, "Count"]
-        fig3 = px.pie(counts, names=label, values="Count", title=label, hole=0.4)
-        fig3.update_layout(height=320, margin=dict(t=40, b=0, l=0, r=0))
-        cols[i % 2].plotly_chart(fig3, use_container_width=True)
+        target = cols[i % 2]
+        if HAS_PLOTLY:
+            fig3 = px.pie(counts, names=label, values="Count", title=label, hole=0.4)
+            fig3.update_layout(height=320, margin=dict(t=40, b=0, l=0, r=0))
+            target.plotly_chart(fig3, use_container_width=True)
+        else:
+            target.markdown(f"**{label}**")
+            target.bar_chart(counts.set_index(label)["Count"])
 
     st.divider()
 
